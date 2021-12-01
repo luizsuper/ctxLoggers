@@ -1,4 +1,4 @@
-module ctxLogger
+module github.com/luizsuper/ctxLoggers
 
 go 1.17
 
