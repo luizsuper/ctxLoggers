@@ -16,7 +16,7 @@ const traceId = "trace_id"
 
 func init() {
 	content, _ := rotatelogs.New(
-		"./logs/info.log"+"-%Y%m%d%H%M",
+		"./logs/%Y%m%d/info.log"+"-%Y%m%d%H%M",
 		rotatelogs.WithRotationTime(4*time.Hour), //rotate 最小为1分钟轮询。默认60s  低于1分钟就按1分钟来
 		rotatelogs.WithMaxAge(time.Hour*24*30),   //日志保存默认保存一个月吧
 	)
