@@ -2,6 +2,7 @@ package ctxLogger
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -73,7 +74,6 @@ func Info(ctx *gin.Context, template string, fields ...zap.Field) {
 	} else {
 		TraceLog.With(fields...).Info(template)
 	}
-
 }
 func Warn(ctx *gin.Context, template string, fields ...zap.Field) {
 	if ctx != nil {
@@ -93,6 +93,37 @@ func Debug(ctx *gin.Context, template string, fields ...zap.Field) {
 func Error(ctx *gin.Context, template string, fields ...zap.Field) {
 	if ctx != nil {
 		TraceLog.With(fields...).Error(template, zap.String("trace_id", ctx.Request.Header.Get(traceId)))
+	} else {
+		TraceLog.With(fields...).Error(template)
+	}
+}
+
+//func for fiber
+func FInfo(ctx *fiber.Ctx, template string, fields ...zap.Field) {
+	if ctx != nil {
+		TraceLog.With(fields...).Info(template, zap.ByteString("trace_id", ctx.Response().Header.Peek(fiber.HeaderXRequestID)))
+	} else {
+		TraceLog.With(fields...).Info(template)
+	}
+}
+func FWarn(ctx *fiber.Ctx, template string, fields ...zap.Field) {
+	if ctx != nil {
+		TraceLog.With(fields...).Warn(template, zap.ByteString("trace_id", ctx.Response().Header.Peek(fiber.HeaderXRequestID)))
+	} else {
+		TraceLog.With(fields...).Warn(template)
+	}
+
+}
+func FDebug(ctx *fiber.Ctx, template string, fields ...zap.Field) {
+	if ctx != nil {
+		TraceLog.With(fields...).Debug(template, zap.ByteString("trace_id", ctx.Response().Header.Peek(fiber.HeaderXRequestID)))
+	} else {
+		TraceLog.With(fields...).Debug(template)
+	}
+}
+func FError(ctx *fiber.Ctx, template string, fields ...zap.Field) {
+	if ctx != nil {
+		TraceLog.With(fields...).Error(template, zap.ByteString("trace_id", ctx.Response().Header.Peek(fiber.HeaderXRequestID)))
 	} else {
 		TraceLog.With(fields...).Error(template)
 	}
