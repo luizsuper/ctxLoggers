@@ -1,6 +1,7 @@
 package ctxLogger
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/gofiber/fiber/v2"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
@@ -68,32 +69,55 @@ func init() {
 	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1)) // 需要传入 zap.AddCaller() 才会显示打日志点的文件名和行数, 有点小坑
 	TraceLog = log
 }
-func Info(ctx *gin.Context, template string, fields ...zap.Field) {
-	if ctx != nil {
-		TraceLog.With(fields...).Info(template, zap.String("trace_id", ctx.Request.Header.Get(traceId)))
-	} else {
+func Info(ctx interface{}, template string, fields ...zap.Field) {
+	switch value := ctx.(type) {
+	case *gin.Context:
+		TraceLog.With(fields...).Info(template, zap.String("trace_id", value.Request.Header.Get(traceId)))
+	case *fiber.Ctx:
+		TraceLog.With(fields...).Info(template, zap.ByteString("trace_id", value.Response().Header.Peek(fiber.HeaderXRequestID)))
+	case context.Context:
+		xId := value.Value(fiber.HeaderXRequestID).(string)
+		TraceLog.With(fields...).Info(template, zap.String("trace_id", xId))
+	default:
 		TraceLog.With(fields...).Info(template)
 	}
 }
-func Warn(ctx *gin.Context, template string, fields ...zap.Field) {
-	if ctx != nil {
-		TraceLog.With(fields...).Warn(template, zap.String("trace_id", ctx.Request.Header.Get(traceId)))
-	} else {
+func Warn(ctx interface{}, template string, fields ...zap.Field) {
+	switch value := ctx.(type) {
+	case *gin.Context:
+		TraceLog.With(fields...).Warn(template, zap.String("trace_id", value.Request.Header.Get(traceId)))
+	case *fiber.Ctx:
+		TraceLog.With(fields...).Warn(template, zap.ByteString("trace_id", value.Response().Header.Peek(fiber.HeaderXRequestID)))
+	case context.Context:
+		xId := value.Value(fiber.HeaderXRequestID).(string)
+		TraceLog.With(fields...).Warn(template, zap.String("trace_id", xId))
+	default:
 		TraceLog.With(fields...).Warn(template)
 	}
-
 }
-func Debug(ctx *gin.Context, template string, fields ...zap.Field) {
-	if ctx != nil {
-		TraceLog.With(fields...).Debug(template, zap.String("trace_id", ctx.Request.Header.Get(traceId)))
-	} else {
+func Debug(ctx interface{}, template string, fields ...zap.Field) {
+	switch value := ctx.(type) {
+	case *gin.Context:
+		TraceLog.With(fields...).Debug(template, zap.String("trace_id", value.Request.Header.Get(traceId)))
+	case *fiber.Ctx:
+		TraceLog.With(fields...).Debug(template, zap.ByteString("trace_id", value.Response().Header.Peek(fiber.HeaderXRequestID)))
+	case context.Context:
+		xId := value.Value(fiber.HeaderXRequestID).(string)
+		TraceLog.With(fields...).Debug(template, zap.String("trace_id", xId))
+	default:
 		TraceLog.With(fields...).Debug(template)
 	}
 }
-func Error(ctx *gin.Context, template string, fields ...zap.Field) {
-	if ctx != nil {
-		TraceLog.With(fields...).Error(template, zap.String("trace_id", ctx.Request.Header.Get(traceId)))
-	} else {
+func Error(ctx interface{}, template string, fields ...zap.Field) {
+	switch value := ctx.(type) {
+	case *gin.Context:
+		TraceLog.With(fields...).Error(template, zap.String("trace_id", value.Request.Header.Get(traceId)))
+	case *fiber.Ctx:
+		TraceLog.With(fields...).Error(template, zap.ByteString("trace_id", value.Response().Header.Peek(fiber.HeaderXRequestID)))
+	case context.Context:
+		xId := value.Value(fiber.HeaderXRequestID).(string)
+		TraceLog.With(fields...).Error(template, zap.String("trace_id", xId))
+	default:
 		TraceLog.With(fields...).Error(template)
 	}
 }
