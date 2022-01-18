@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -76,7 +77,7 @@ func Info(ctx interface{}, template string, fields ...zap.Field) {
 	case *fiber.Ctx:
 		TraceLog.With(fields...).Info(template, zap.ByteString("trace_id", value.Response().Header.Peek(fiber.HeaderXRequestID)))
 	case context.Context:
-		xId := value.Value(fiber.HeaderXRequestID).(string)
+		xId := value.Value(strings.ToLower(fiber.HeaderXRequestID)).(string)
 		TraceLog.With(fields...).Info(template, zap.String("trace_id", xId))
 	default:
 		TraceLog.With(fields...).Info(template)
@@ -89,7 +90,7 @@ func Warn(ctx interface{}, template string, fields ...zap.Field) {
 	case *fiber.Ctx:
 		TraceLog.With(fields...).Warn(template, zap.ByteString("trace_id", value.Response().Header.Peek(fiber.HeaderXRequestID)))
 	case context.Context:
-		xId := value.Value(fiber.HeaderXRequestID).(string)
+		xId := value.Value(strings.ToLower(fiber.HeaderXRequestID)).(string)
 		TraceLog.With(fields...).Warn(template, zap.String("trace_id", xId))
 	default:
 		TraceLog.With(fields...).Warn(template)
@@ -102,7 +103,7 @@ func Debug(ctx interface{}, template string, fields ...zap.Field) {
 	case *fiber.Ctx:
 		TraceLog.With(fields...).Debug(template, zap.ByteString("trace_id", value.Response().Header.Peek(fiber.HeaderXRequestID)))
 	case context.Context:
-		xId := value.Value(fiber.HeaderXRequestID).(string)
+		xId := value.Value(strings.ToLower(fiber.HeaderXRequestID)).(string)
 		TraceLog.With(fields...).Debug(template, zap.String("trace_id", xId))
 	default:
 		TraceLog.With(fields...).Debug(template)
@@ -115,7 +116,7 @@ func Error(ctx interface{}, template string, fields ...zap.Field) {
 	case *fiber.Ctx:
 		TraceLog.With(fields...).Error(template, zap.ByteString("trace_id", value.Response().Header.Peek(fiber.HeaderXRequestID)))
 	case context.Context:
-		xId := value.Value(fiber.HeaderXRequestID).(string)
+		xId := value.Value(strings.ToLower(fiber.HeaderXRequestID)).(string)
 		TraceLog.With(fields...).Error(template, zap.String("trace_id", xId))
 	default:
 		TraceLog.With(fields...).Error(template)
